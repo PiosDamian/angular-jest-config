@@ -1,0 +1,23 @@
+{
+  "name": "angular-jest",
+  "version": "1.0.0",
+  "description": "Library to configure Angular to work with Jest",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PiosDamian/angular-jest-config.git"
+  },
+  "keywords": [
+    "angular",
+    "jest"
+  ],
+  "author": "Damian Pioś",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PiosDamian/angular-jest-config/issues"
+  },
+  "homepage": "https://github.com/PiosDamian/angular-jest-config#readme"
+}
