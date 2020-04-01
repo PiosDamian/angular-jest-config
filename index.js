@@ -3,33 +3,45 @@
 const { exec } = require('child_process');
 const fs = require('fs');
 
-const main = () => {
-    execCommands().then(() => {
-        createFiles();
+const main = async () => {
+    await execCommands()
+    createFiles();
 
-        updatePackage();
+    updatePackage();
 
-        updateAngular();
+    updateAngular();
 
-        deleteFiles();
+    deleteFiles();
 
-        updateTsConfigSpec();
-    });
+    updateTsConfigSpec();
 }
 
-const execCommands = async () => {
+const execCommands = () => {
     return execCommandPromise('npm i --save-dev jest jest-preset-angular')
         .then(() => execCommandPromise('npm uninstall karma karma-chrome-launcher karma-coverage-istanbul-reporter karma-jasmine karma-jasmine-html-reporter'))
 };
 
-const execCommandPromise = async (command) => {
+const execCommandPromise = (command) => {
     return new Promise((res, rej) => {
+        const prefix = [
+            '\\', '|', '/', '-'
+        ];
+
+        let currentPrefixIndex = prefix.length;
+
+        const interval = setInterval(() => {
+            currentPrefixIndex = ++currentPrefixIndex >= prefix.length ? 0 : currentPrefixIndex;
+            process.stdout.write(`${prefix[currentPrefixIndex]} Executing ${command}`);
+            process.stdout.write('\r');
+        }, 200)
+
         const child = exec(command, (err, stdout, stderr) => {
+            clearInterval(interval);
             if (err) {
-                console.error(`exec error: ${err}`);
+                process.stderr.write(`\nexec error: ${err}`);
                 rej(err);
             }
-            console.error(stderr);
+            process.stderr.write(`\n${stderr}`);
             res();
         });
 
@@ -40,19 +52,19 @@ const execCommandPromise = async (command) => {
 const createFiles = () => {
     try {
         fs.writeFileSync('src/jestGlobalMock.ts', '');
-        console.log('File jestGlobalMock.ts created');
+        process.stdout.write('\nFile jestGlobalMock.ts created');
     } catch (err) {
-        console.error('Problem with creating file jestGlobalMock.ts');
-        console.error(err);
+        process.stderr.write('\nProblem with creating file jestGlobalMock.ts');
+        process.stderr.write(`\n${err}`);
         throw err;
     }
 
     try {
-        fs.writeFileSync('src/setupJest.ts', "import 'jest-preset-angular'\; \n import './jestGlobalMock'\;");
-        console.log('File setupJest.ts created');
+        fs.writeFileSync('\nsrc/setupJest.ts', "import 'jest-preset-angular'\; \n import './jestGlobalMock'\;");
+        process.stdout.write('\nFile setupJest.ts created');
     } catch (err) {
-        console.error('Problem with creating file setupJest.ts');
-        console.error(err);
+        process.stderr.write('\nProblem with creating file setupJest.ts');
+        process.stderr.write(`\n${err}`);
         throw err;
     }
 };
@@ -75,14 +87,14 @@ const updatePackage = () => {
 
     try {
         fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
-        console.log('File package.json updated');
+        process.stdout.write('\nFile package.json updated');
     } catch (err) {
-        console.error('Problem with updating file package.json');
-        console.log('You can do it by yourself');
-        console.log('Just add following to package.json');
-        console.log(`jest: ${JSON.stringify(packageJson.jest, null, 2)}`);
-        console.log('And change scripts.test to "jest"');
-        console.error(err);
+        process.stderr.write('\nProblem with updating file package.json');
+        process.stdout.write('\nYou can do it by yourself');
+        process.stdout.write('\nJust add following to package.json');
+        process.stdout.write(`\njest: ${JSON.stringify(packageJson.jest, null, 2)}`);
+        process.stdout.write('\nAnd change scripts.test to "jest"');
+        process.stderr.write(`\n${err}`);
 
     }
 };
@@ -100,12 +112,12 @@ const updateAngular = () => {
     });
     try {
         fs.writeFileSync('angular.json', JSON.stringify(angular, null, 2));
-        console.log('File angular.json updated');
+        process.stdout.write('\nFile angular.json updated');
     } catch (err) {
-        console.error('Problem with updating file angular.json');
-        console.log('You can do it by yourself');
-        console.log('Just remove test section from all projects');
-        console.error(err);
+        process.stderr.write('\nProblem with updating file angular.json');
+        process.stdout.write('\nYou can do it by yourself');
+        process.stdout.write('\nJust remove test section from all projects');
+        process.stderr.write(`\n${err}`);
 
     }
 };
@@ -113,18 +125,18 @@ const updateAngular = () => {
 const deleteFiles = () => {
     try {
         fs.unlinkSync('karma.conf.js');
-        console.log('File src/karma.config.js deleted');
+        process.stdout.write('\nFile src/karma.config.js deleted');
     } catch (err) {
-        console.error('Problem with deleting file src/karma.config.js');
-        console.error(err);
+        process.stderr.write('\nProblem with deleting file src/karma.config.js');
+        process.stderr.write(err);
     }
 
     try {
         fs.unlinkSync('src/test.ts');
-        console.log('File src/test.ts deleted');
+        process.stdout.write('\nFile src/test.ts deleted');
     } catch (err) {
-        console.error('Problem with deleting file src/test.ts');
-        console.error(err);
+        process.stderr.write('\nProblem with deleting file src/test.ts');
+        process.stderr.write(err);
     }
 };
 
@@ -139,14 +151,14 @@ const updateTsConfigSpec = () => {
         specFiles.splice(index, 1);
         try {
             fs.writeFileSync('tsconfig.spec.json', JSON.stringify(tsconfigSpec, null, 2));
-            console.log('File tsconfig.spec.json updated');
+            process.stdout.write('\nFile tsconfig.spec.json updated');
         } catch (err) {
-            console.error('Problem with updating file tsconfig.spec.json');
-            console.log('You can do it by yourself');
-            console.log('Just remove "src/test.ts" from files section');
-            console.log('And add "sModuleInterop": true to compiler options');
-            console.log('In tsconfig.spec.json');
-            console.error(err);
+            process.stderr.write('\nProblem with updating file tsconfig.spec.json');
+            process.stdout.write('\nYou can do it by yourself');
+            process.stdout.write('\nJust remove "src/test.ts" from files section');
+            process.stdout.write('\nAnd add "sModuleInterop": true to compiler options');
+            process.stdout.write('\nIn tsconfig.spec.json');
+            process.stderr.write(`\n${err}`);
         }
     }
 };
