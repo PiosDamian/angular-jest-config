@@ -1,6 +1,6 @@
 {
   "name": "angular-jest-configurer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Library to configure Angular to work with Jest based on https://medium.com/angular-in-depth/integrate-jest-into-an-angular-application-and-library-163b01d977ce",
   "main": "index.js",
   "scripts": {
