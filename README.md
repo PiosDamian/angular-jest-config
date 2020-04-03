@@ -10,3 +10,4 @@ Usage:
 angular-jest-configure
 ```
 
+[Manual](https://medium.com/angular-in-depth/integrate-jest-into-an-angular-application-and-library-163b01d977ce)
